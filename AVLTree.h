@@ -67,6 +67,7 @@ public:
     size_t numElements;
 
     //Ta inja omadam--> FOR next time
+    std::cout << "here is the line" << endl;
 
 
     /* Helper methods for remove */
