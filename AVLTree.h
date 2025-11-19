@@ -5,6 +5,10 @@
 #ifndef AVLTREE_H
 #define AVLTREE_H
 #include <string>
+#include <vector>
+#include <optional>
+#include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -23,6 +27,9 @@ protected:
         AVLNode* left;
         AVLNode* right;
 
+        // Node creator
+        AVLNode(KeyType k, ValueType v): key(k), value(v), height(1), left(nullptr), right(nullptr) {}
+
         // 0, 1 or 2
         size_t numChildren() const;
         // true or false
@@ -34,12 +41,33 @@ protected:
     };
 
 public:
+    AVLTree();
+    AVLTree(const AVLTree& other);
+    AVLTree& operator = (const AVLTree& other);
+    ~AVLTree();
 
+    // Core operations
+    bool insert(const KeyType& key, ValueType value);
+    bool remove(const KeyType& key);
+    bool contains(const KeyType& key) const;
 
+    //Range & Info
+    std::vector<ValueType> findRange(const KeyType& lowKey, const KeyType& highKey) const;
+    std::vector<KeyType> keys() const;
+    size_t size() const;
+    size_t getHeight() const;
+
+    //Printing to have access to private data
+    friend std::ostream& operator<<(std::ostream& os, const AVLTree& avlTree);
 
 
     private:
     AVLNode* root;
+    //size O(1) tracker
+    size_t numElements;
+
+    //Ta inja omadam--> FOR next time
+
 
     /* Helper methods for remove */
     // this overloaded remove will do the recursion to remove the node
