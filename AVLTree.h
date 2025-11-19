@@ -66,8 +66,32 @@ public:
     //size O(1) tracker
     size_t numElements;
 
-    //Ta inja omadam--> FOR next time
-    std::cout << "here is the line" << endl;
+    //Ta inja omadam-->
+    int height(AVLNode* node) const;
+    int getBalance(AVLNode* node) const;
+
+    // Rotation
+    AVLNode* rotateRight(AVLNode* y);
+    AVLNode* rotateLeft(AVLNode* x);
+
+    void balanceNode(AVLNode*& node); //It will fix the node balance
+    // This is new to me--> reference to the pointer
+
+    //Interesting part--> Recursive
+    void insertHelper(AVLNode*& node, const KeyType& key, ValueType value, bool& success);
+
+    // search - get
+    const ValueType* getHelper(AVLNode* node, const KeyType& key) const;
+    bool containsHelper(AVLNode* node, const KeyType& key) const;
+    ValueType& bracketHelper(AVLNode*& node, const KeyType& key);
+
+    //Remove
+    bool removeHelper(AVLNode*& current, const KeyType& key);
+    bool removeNode(AVLNode*& current);
+
+    //Ta inja omadam
+
+
 
 
     /* Helper methods for remove */
