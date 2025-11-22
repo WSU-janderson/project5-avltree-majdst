@@ -3,66 +3,107 @@
 #include "AVLTree.h"
 
 #include <string>
+#include "AVLTree.h"
+#include <iostream>
+#include <algorithm>
 
+using namespace std;
+
+// returns--> children of a node
 size_t AVLTree::AVLNode::numChildren() const {
-    return 0;
+    size_t count = 0;
+    if (this-> left != nullptr) count++;
+    if (this->right != nullptr) count++;
+    return count;
 }
 
+//node--> no children
 bool AVLTree::AVLNode::isLeaf() const {
-    return false;
+    return (this->left == nullptr && this->right == nullptr);
 }
 
-size_t AVLTree::AVLNode::getHeight() const {
-    return 0;
+//height in node
+size_t AVLTree::AVLNode::getHeight() const{ return this->height;}
+
+AVLTree::AVLTree() {
+    root = nullptr;
+    numElements = 0;
+}
+//null pointer preventing crush
+int AVLTree::height(AVLNode* node) const {
+    if (node == nullptr){return 0;}
+    return node->height;
+}
+//node balance --> check
+int AVLTree::getBalance(AVLNode* node) const {
+    if (node == nullptr){return 0;}
+    return height(node->left) - height(node->right);
+    //positive means left is heavy-->negative means right is heavy
 }
 
-bool AVLTree::removeNode(AVLNode*& current){
-    if (!current) {
-        return false;
-    }
+//right rotation--> fixing the left heavier
+AVLTree::AVLNode* AVLTree::rotateRight(AVLNode* y) {
+    AVLNode* x = y->left;
+    AVLNode* T2 = x->right;
 
-    AVLNode* toDelete = current;
-    auto nChildren = current->numChildren();
-    if (current->isLeaf()) {
-        // case 1 we can delete the node
-        current = nullptr;
-    } else if (current->numChildren() == 1) {
-        // case 2 - replace current with its only child
-        if (current->right) {
-            current = current->right;
-        } else {
-            current = current->left;
+    x->right = y;
+    y->left = T2;
+    //rotation is done
+
+    y->height = 1 + std::max(height(y->left), height(y->right));
+    x->height = 1 + std::max(height(x->left), height(x->right));
+    //heights update
+
+    return x; //-->this is new root
+}
+
+//left rotation --> fixing the right heavier
+AVLTree::AVLNode* AVLTree::rotateRight(AVLNode* y) {
+    AVLNode* x = y->left;
+    AVLNode* T2 = x->right;
+
+    x->right = y;
+    y->left = T2;
+    //rotation is done
+
+    y->height = 1 + std::max(height(y->left), height(y->right));
+    x->height = 1 + std::max(height(x->left), height(x->right));
+    //heights update
+
+    return x; //-->this is new root
+}
+
+AVLTree::AVLNode* AVLTree::rotateLeft(AVLNode* x) {
+    AVLNode* y = x->right;
+    AVLNode* T2 = y->left;
+
+    x->left = y;
+    y->right = T2;
+    //rotation is done
+
+    x->height = 1 + std::max(height(x->left), height(x->right));
+    y->height = 1 + std::max(height(y->left), height(y->right));
+    //heights update
+
+    return y; //-->this is new root
+}
+
+//Balance Node
+void AVLTree::balanceNode(AVLNode*& node) {
+    if (node == nullptr) return;
+
+    //height update
+    node -> height = 1 + std::max(height(node->left), height(node->right));
+
+    //check balance
+    int balance = getBalance(node);
+
+    if (balance > 1) {
+
+        //zigzag check
+        if (getBalance(node->right) > 0) {
+            node->right = rotateRight(node->right);
         }
-    } else {
-        // case 3 - we have two children,
-        // get smallest key in right subtree by
-        // getting right child and go left until left is null
-        AVLNode* smallestInRight = current->right;
-        // I could check if smallestInRight is null,
-        // but it shouldn't be since the node has two children
-        while (smallestInRight->left) {
-            smallestInRight = smallestInRight->left;
-        }
-        std::string newKey = smallestInRight->key;
-        int newValue = smallestInRight->value;
-        remove(root, smallestInRight->key); // delete this one
-
-        current->key = newKey;
-        current->value = newValue;
-
-        current->height = current->getHeight();
-        balanceNode(current);
-
-        return true; // we already deleted the one we needed to so return
+        node = rotateLeft(node);
     }
-    delete toDelete;
-
-    return true;
-}
-
-bool AVLTree::remove(AVLNode *&current, KeyType key) {
-    return false;
-}
-
-void AVLTree::balanceNode(AVLNode *&node) {
 }
