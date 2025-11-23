@@ -107,3 +107,92 @@ void AVLTree::balanceNode(AVLNode*& node) {
         node = rotateLeft(node);
     }
 }
+bool AVLTree::insert(const KeyType& key, ValueType value) {
+    bool success = false;
+    insertHelper(root, key, value, success);
+
+    if (success){numElements++;}
+    return success;
+}
+
+void AVLTree::insertHelper(AVLNode*& node, const KeyType& key, ValueType value, bool& success) {
+    if (node == nullptr) {
+        node = new AVLNode(key, value);
+        success = true;
+        return;
+    }
+    if (key < node->key) {
+        insertHelper(node->left, key, value, success);
+
+    } else if (key > node->key) {
+        insertHelper(node->right, key, value, success);
+    }else {
+        success = false;
+        return;
+    }if (success){balanceNode(node);}
+}
+
+bool AVLTree::remove(const KeyType& key) {
+    //recursion part
+    if (removeHelper(root, key)) {
+        numElements--;
+        return true;
+    }
+    return false;
+}
+
+//Node finding with recursive
+bool AVLTree::removeHelper(AVLNode*& current, const KeyType& key) {
+    if (current == nullptr) return false;
+    bool success = false;
+
+    if (key < current -> key) {
+        success = removeHelper(current->left, key);
+    } else if (key > current->key) {
+        success = removeHelper(current->right, key);
+    } else {
+        success = removeNode(current);
+    }
+    if (success) {
+        balanceNode(current);
+    }
+    return success;
+}
+// node deleter
+bool AVLTree::removeNode(AVLNode*& current) {
+
+    if (!current) return false;
+    AVLNode* toDelete = current;
+
+    //leaf remover
+    if (current -> isLeaf()) {
+        current = nullptr;
+        delete toDelete;
+    }
+    //one child
+    else if (current -> numChildren() == 1) {
+        if (current -> right) {
+            current = current -> right;
+        } else {
+            current = current -> left;
+        }
+        delete toDelete;
+    }//two children
+    else {
+        AVLNode* smallestInRight = current->right;
+        while (smallestInRight->left) {
+            smallestInRight = smallestInRight->left;
+        }
+//fixing the size int
+        std::string newKey = smallestInRight ->key;
+        size_t newValue = smallestInRight ->value;
+
+        //recursive again-->remove
+        removeHelper(current->right, smallestInRight->key);
+
+        //updating every node
+        current->key = newKey;
+        current->value = newValue;
+    }
+    return true;
+}
